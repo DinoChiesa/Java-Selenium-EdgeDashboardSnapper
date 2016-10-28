@@ -30,7 +30,8 @@ slackToken=acquire-this-from-www.slack.com
 # please url-escape @ and # in the slackchannel name
 slackChannel=%23slackbot
 
-# the following is Optional, if not specified, WebDriver will search your path for chromedriver.
+# specifying webdriver.chrome.driver is optional.
+# if not specified, WebDriver will search your path for chromedriver.
 webdriver.chrome.driver=/Users/dino/Applications/chromedriver
 
 ```

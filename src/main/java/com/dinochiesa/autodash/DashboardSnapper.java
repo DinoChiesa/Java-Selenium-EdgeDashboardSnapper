@@ -1,14 +1,20 @@
 package com.dinochiesa.autodash;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Properties;
 import java.util.Hashtable;
-import java.text.SimpleDateFormat;
+import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 
 import org.openqa.selenium.By;
@@ -23,10 +29,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.OutputType;
 
 import net.oneandone.sushi.util.NetRc;
-import java.util.ArrayList;
-import java.nio.file.Files;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 
 public class DashboardSnapper {
@@ -44,69 +46,85 @@ public class DashboardSnapper {
         return fmt.format(c.getTime());
     }
 
-    public static void snapAndPostDashboard(String org, String username, String password, String slackChannel, String slackToken) throws InterruptedException, IOException {
+    public void snapAndPostDashboard(String org, String username, String password, String slackChannel, String slackToken) throws InterruptedException, IOException {
+
         WebDriver driver = new ChromeDriver();
-        driver.get("https://login.apigee.com/login");
-         (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@name='username']")));
+        try {
+            driver.get("https://login.apigee.com/login");
+            (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@name='username']")));
 
-        WebElement usernameBox = driver.findElement(By.xpath("//input[@name='username']"));
-        usernameBox.sendKeys(username);
-        WebElement passwordBox = driver.findElement(By.xpath("//input[@name='password']"));
-        passwordBox.sendKeys(password);
-        WebElement submitBtn = driver.findElement(By.xpath("//input[@type='submit']"));
-        submitBtn.submit();
-         // Wait for the page to load, timeout after 10 seconds
-        (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.id("apiManagementLink")));
+            WebElement usernameBox = driver.findElement(By.xpath("//input[@name='username']"));
+            usernameBox.sendKeys(username);
+            WebElement passwordBox = driver.findElement(By.xpath("//input[@name='password']"));
+            passwordBox.sendKeys(password);
+            WebElement submitBtn = driver.findElement(By.xpath("//input[@type='submit']"));
+            submitBtn.submit();
+            // Wait for the page to load, timeout after 10 seconds
+            (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(By.id("apiManagementLink")));
 
-        // (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
-        //     public Boolean apply(WebDriver d) {
-        //         WebElement apiMgmtTile = driver.findElement(By.id("apiManagementLink"));
-        //     }
-        // });
+            // (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+            //     public Boolean apply(WebDriver d) {
+            //         WebElement apiMgmtTile = driver.findElement(By.id("apiManagementLink"));
+            //     }
+            // });
 
-        // navigate to edge
-        driver.get("https://enterprise.apigee.com");
-        String selectorPath = "//div[@id='organizationSelector']/a";
-        (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath(selectorPath)));
+            // navigate to edge
+            driver.get("https://enterprise.apigee.com");
+            String selectorPath = "//div[@id='organizationSelector']/a";
+            (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(selectorPath)));
 
-        driver.findElement(By.xpath(selectorPath)).click();
+            driver.findElement(By.xpath(selectorPath)).click();
 
-        //String orgAnchorPath = "//div[@id='organizationSelector']/ul/li/a[span[contains(text(),'ap-parityapi')]]";
-        String orgAnchorPath = String.format("//div[@id='organizationSelector']/ul/li/a[span[normalize-space(text())='%s']]", org);
-        driver.findElement(By.xpath(orgAnchorPath)).click();
-        Thread.sleep(750);
+            //String orgAnchorPath = "//div[@id='organizationSelector']/ul/li/a[span[contains(text(),'ap-parityapi')]]";
+            String orgAnchorPath = String.format("//div[@id='organizationSelector']/ul/li/a[span[normalize-space(text())='%s']]", org);
+            driver.findElement(By.xpath(orgAnchorPath)).click();
+            Thread.sleep(750);
 
-        // wait again for the org selector
-        (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath(selectorPath)));
+            // wait again for the org selector
+            (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(selectorPath)));
 
-        // wait for the dashboard legend to appear
-        // "/html/body//div[contains(@class,'summary-label') and normalize-space(text())='total traffic']";
-        String legendPath = "/html/body//div[contains(@class,'summary-label')]";
-        (new WebDriverWait(driver, 10))
-            .until(ExpectedConditions.elementToBeClickable(By.xpath(legendPath)));
+            // wait for the dashboard legend to appear
+            // "/html/body//div[contains(@class,'summary-label') and normalize-space(text())='total traffic']";
+            String legendPath = "/html/body//div[contains(@class,'summary-label')]";
+            (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(legendPath)));
 
-        WebElement legend = driver.findElement(By.xpath(legendPath));
-        // legend.getText()
+            WebElement legend = driver.findElement(By.xpath(legendPath));
+            // legend.getText()
 
-        // take screenshot
-        File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-        String filename = String.format("./dashboard-%s.png", nowFormatted());
-        FileUtils.copyFile(scrFile, new File(filename));
-        System.out.printf("** screenshot: %s\n", filename);
+            // take screenshot
+            File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+            String filename = String.format("/tmp/dashboard-%s.png", nowFormatted());
+            FileUtils.copyFile(scrFile, new File(filename));
+            System.out.printf("screenshot: %s\n", filename);
 
-        String commandString = String.format("curl -i -F file=@%s -F filename=%s -F token=%s  https://slack.com/api/files.upload?channels=%s",
-                                             filename,
-                                             filename,
-                                             slackToken,
-                                             slackChannel);
+            String commandTemplate = "curl -i -F file=@%s -F filename=%s -F token=%s  https://slack.com/api/files.upload?channels=%s";
 
-        final Runtime rt = Runtime.getRuntime();
-        rt.exec(commandString);
-        driver.quit();
+            String commandString = String.format(commandTemplate,
+                                                 filename, filename, slackToken, slackChannel);
+            if (getVerbose()) {
+                String cleanCommandString = String.format(commandTemplate,
+                                                 filename, filename, "<TOKEN>", slackChannel);
+                System.out.printf("curl: %s\n", cleanCommandString);
+            }
+
+            Process p = Runtime.getRuntime().exec(commandString);
+            if (getVerbose()) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()) );
+                String line;
+                while ((line = in.readLine()) != null) {
+                    System.out.println(line);
+                }
+                in.close();
+            }
+        }
+        finally {
+            driver.quit();
+        }
     }
 
     public static void Usage() {
@@ -195,9 +213,18 @@ public class DashboardSnapper {
         }
     }
 
+    private boolean getVerbose() {
+        Boolean v = (Boolean) this.options.get("v");
+        return (v != null && v);
+    }
+
     public void Run() throws Exception {
-        Boolean verbose = (Boolean) this.options.get("v");
-        verbose = (verbose != null && verbose);
+
+        if (getVerbose()) {
+            Path currentRelativePath = Paths.get("");
+            String s = currentRelativePath.toAbsolutePath().toString();
+            System.out.println("Current path is: " + s);
+        }
 
         Properties props = null;
         String propsFile = (String) this.options.get("P");
