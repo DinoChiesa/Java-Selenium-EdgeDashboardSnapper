@@ -49,6 +49,7 @@ public class DashboardSnapper {
     public void snapAndPostDashboard(String org, String username, String password, String slackChannel, String slackToken) throws InterruptedException, IOException {
 
         WebDriver driver = new ChromeDriver();
+        String snapshotFile = "";
         try {
             driver.get("https://login.apigee.com/login");
             (new WebDriverWait(driver, 10))
@@ -98,17 +99,17 @@ public class DashboardSnapper {
 
             // take screenshot
             File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-            String filename = String.format("/tmp/dashboard-%s.png", nowFormatted());
-            FileUtils.copyFile(scrFile, new File(filename));
-            System.out.printf("screenshot: %s\n", filename);
+            snapshotFile = String.format("/tmp/dashboard-%s.png", nowFormatted());
+            FileUtils.copyFile(scrFile, new File(snapshotFile));
+            System.out.printf("screenshot: %s\n", snapshotFile);
 
             String commandTemplate = "curl -i -F file=@%s -F filename=%s -F token=%s  https://slack.com/api/files.upload?channels=%s";
 
             String commandString = String.format(commandTemplate,
-                                                 filename, filename, slackToken, slackChannel);
+                                                 snapshotFile, snapshotFile, slackToken, slackChannel);
             if (getVerbose()) {
                 String cleanCommandString = String.format(commandTemplate,
-                                                 filename, filename, "<TOKEN>", slackChannel);
+                                                          snapshotFile, snapshotFile, "<TOKEN>", slackChannel);
                 System.out.printf("curl: %s\n", cleanCommandString);
             }
 
@@ -124,6 +125,9 @@ public class DashboardSnapper {
         }
         finally {
             driver.quit();
+            File file = new File(snapshotFile);
+            if(file.exists())
+                file.delete();
         }
     }
 
