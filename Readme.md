@@ -52,4 +52,19 @@ mvn clean package
 java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.DashboardSnapper
 ```
 
+## Running via Cron
+
+One possible pattern is to run this program with cron so that you get a new snapshot every day, posted to slack.
+
+The script [cron-autodash.sh](cron-autodash.sh) can help with that.
+
+Format your crontab entry like this:
+
+```
+30 07 * * * /path/to/autodash/cron-autodash.sh ORGNAME
+```
+
+This will run the cron-autodash.sh at 7:30 am local time.  There is one argument required: the name of the Edge organization . The script looks for a file named  autodash-ORGNAME.properties, in the same directory as it resides.  Eg, in /path/to/autodash/autodash-ORGNAME.properties .
+
+
 
