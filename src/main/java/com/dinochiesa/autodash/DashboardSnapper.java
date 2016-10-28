@@ -110,8 +110,8 @@ public class DashboardSnapper {
     }
 
     public static void Usage() {
-        System.out.println("DashboardSnapper: <usage statement here>.\n");
-        System.out.println("Usage:\n  java JwtNimbus [-v]  -f <value>");
+        System.out.println("DashboardSnapper: Screenshot Edge dashboard and post it to Slack.\n");
+        System.out.println("Usage:\n  java DashboardSnapper [-v] [-P <propsfile>] [-n]");
     }
 
     private static NetRc.Authenticator getAuthenticator(String host) throws Exception {
@@ -215,7 +215,6 @@ public class DashboardSnapper {
             props = loadProps(propsFile);
         }
 
-
         Boolean useNetrc = (Boolean) this.options.get("n");
         useNetrc = (useNetrc != null && useNetrc);
 
@@ -230,11 +229,9 @@ public class DashboardSnapper {
 
         String chromeDriverPropName = "webdriver.chrome.driver";
         String chromeDriver = (String) props.get(chromeDriverPropName);
-        if (chromeDriver == null)
-            throw new IllegalStateException(String.format("missing %s in properties",
-                                                          chromeDriverPropName));
 
-        System.setProperty(chromeDriverPropName, chromeDriver);
+        if (chromeDriver != null)
+            System.setProperty(chromeDriverPropName, chromeDriver);
 
         snapAndPostDashboard((String)props.get("org"),
                              (String)props.get("username"),
