@@ -1,12 +1,14 @@
 # Dashboard Snapper
 
-This tool to
-- drive a web browser to login to Edge,
-- navigate to a particular organization,
-- grab a snapshot of the dashboard
-- and post it to a slack channel of your choice. 
+This is a tool that posts a snapshot of an Apigee dashboard to a slack channel. 
 
-It depends on:
+This tool 
+- drives a web browser to login to Edge,
+- navigates to a particular organization,
+- grabs a snapshot of the dashboard
+- and posts it to a slack channel of your choice.
+
+The tool depends on:
 
 - Java
 - Selenium (the library that allows automation of browsers)
@@ -19,7 +21,7 @@ It depends on:
 You must set the properties in a Java properties file.
 The program looks for "autodash.properties" in the current directory, or you can override it with the -P option.
 
-Example:
+Example contents of autodash.properties:
 
 ```
 # these are secrets and should not be disclosed
@@ -31,7 +33,7 @@ slackToken=acquire-this-from-www.slack.com
 slackChannel=%23slackbot
 
 # specifying webdriver.chrome.driver is optional.
-# if not specified, WebDriver will search your path for chromedriver.
+# if not specified, WebDriver will search your path for the chromedriver executable.
 webdriver.chrome.driver=/Users/dino/Applications/chromedriver
 
 ```
@@ -49,8 +51,21 @@ mvn clean package
 ## Run with:
 
 ```
+mvn exec:exec
+```
+
+or:
+
+```
+mvn exec:exec -Dautodash.properties=./autodash-ORGNAME.properties
+```
+or:
+
+```
 java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.DashboardSnapper
 ```
+
+
 
 ## Running via Cron
 

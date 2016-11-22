@@ -239,7 +239,7 @@ public class DashboardSnapper {
                 props = loadProps("./autodash.properties");
             }
             else {
-                throw new IllegalStateException("missing P argument");
+                throw new IllegalStateException("missing P argument and cannot find autodash.properties file");
             }
         }
         else {
