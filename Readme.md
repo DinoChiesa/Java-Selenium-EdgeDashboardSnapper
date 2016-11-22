@@ -83,3 +83,8 @@ This will run the cron-autodash.sh at 7:30 am local time.  There is one argument
 
 
 
+## License
+
+This material is [copyright 2016 Google Inc.](NOTICE)
+and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration. 
+
