@@ -38,6 +38,8 @@ webdriver.chrome.driver=/Users/dino/Applications/chromedriver
 
 ```
 
+You can also view [the example](autodash-EXAMPLE.properties).
+
 This tool works only with the ChromeDriver.  You must have Google Chrome installed.
 
 
