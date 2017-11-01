@@ -188,19 +188,18 @@ public class DashboardSnapper {
                 if (i+1 < L) {
                     i++;
                     Object current = this.options.get(m.group(1));
-                    ArrayList<String> newList;
                     if (current == null) {
                         // not a previously-seen option
                         this.options.put(m.group(1), args[i]);
                     }
                     else if (current instanceof ArrayList<?>) {
-                        // previously seen, and already a lsit
-                        newList = (ArrayList<String>) current;
-                        newList.add(args[i]);
+                        // previously seen, and already a list
+                        @SuppressWarnings("unchecked") ArrayList<String> oldList = (ArrayList<String>) current;
+                        oldList.add(args[i]);
                     }
                     else {
                         // we have one value, need to make a list
-                        newList = new ArrayList<String>();
+                        ArrayList<String> newList = new ArrayList<String>();
                         newList.add((String)current);
                         newList.add(args[i]);
                         this.options.put(m.group(1), newList);
