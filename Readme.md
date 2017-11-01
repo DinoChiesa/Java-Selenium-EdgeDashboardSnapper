@@ -83,7 +83,7 @@ It's somewhat similar to the mvn exec:exec invocation above.
 ### Example 4
 
 This invocation runs the UEDashboardSnapper, which captures the API Proxy traffic over the past week.  It reads from the specified file
-and uses .netrc to obtain credentials for Apigee Edge. 
+and uses .netrc to obtain credentials for Apigee Edge.
 
 ```
 java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.UEDashboardSnapper -P autodash-sbux-production.properties -n
@@ -112,6 +112,10 @@ If that bash script doesn't satisfy, you can modify it to suit your needs.
 
 ## License
 
-This material is [copyright 2016 Google Inc.](NOTICE)
-and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration. 
+This material is [copyright 2016, 2017 Google Inc.](NOTICE)
+and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration.
 
+
+## Bugs
+
+* This tool cannot post to a Google Chat (Dynamite) room.  The API for Google chat doesn't allow upload of an image.
