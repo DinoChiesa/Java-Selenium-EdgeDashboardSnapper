@@ -1,8 +1,8 @@
 # Dashboard Snapper
 
-This is a tool that posts a snapshot of an Apigee dashboard to a slack channel. 
+This is a tool that posts a snapshot of an Apigee dashboard to a slack channel.
 
-This tool 
+This tool
 - drives a web browser to login to Edge,
 - navigates to a particular organization,
 - grabs a snapshot of the dashboard
@@ -50,21 +50,44 @@ mvn clean package
 
 ```
 
-## Run with:
+## Running the program
+
+### Example 1
+
+This reads from the autodash.properties file that is local to the invocation:
 
 ```
 mvn exec:exec
 ```
 
-or:
+
+### Example 2
+
+This reads from the specified properties file.
 
 ```
 mvn exec:exec -Dautodash.properties=./autodash-ORGNAME.properties
 ```
-or:
+
+### Example 3
+
+This reads from the autodash.properties file that is local to the invocation:
 
 ```
 java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.DashboardSnapper
+```
+
+It's somewhat similar to the mvn exec:exec invocation above.
+
+
+### Example 4
+
+This invocation runs the UEDashboardSnapper, which captures the API Proxy traffic over the past week.  It reads from the specified file
+and uses .netrc to obtain credentials for Apigee Edge. 
+
+```
+java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.UEDashboardSnapper -P autodash-sbux-production.properties -n
+
 ```
 
 
@@ -82,6 +105,8 @@ Format your crontab entry like this:
 ```
 
 This will run the cron-autodash.sh at 7:30 am local time.  There is one argument required: the name of the Edge organization . The script looks for a file named  autodash-ORGNAME.properties, in the same directory as it resides.  Eg, in /path/to/autodash/autodash-ORGNAME.properties .
+
+If that bash script doesn't satisfy, you can modify it to suit your needs.
 
 
 
