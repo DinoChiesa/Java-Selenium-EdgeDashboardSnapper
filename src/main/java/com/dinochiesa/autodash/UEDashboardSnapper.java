@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -63,14 +64,7 @@ public class UEDashboardSnapper {
             submitBtn.submit();
             Thread.sleep(2150);
 
-            // (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
-            //     public Boolean apply(WebDriver d) {
-            //         WebElement apiMgmtTile = driver.findElement(By.id("apiManagementLink"));
-            //     }
-            // });
-
             // Wait for the page to load, timeout after 10 seconds
-            //String orgSelectorPath = "//#navbar/div/div/div";
             driver.get("https://apigee.com/edge");
             //String orgSelectorPath = "div#user-ini";
             (new WebDriverWait(driver, 10))
@@ -95,41 +89,57 @@ public class UEDashboardSnapper {
             // 
             // driver.findElement(By.xpath(analyzeItemPath)).click();
 
-
             String orgAnalyticsPath = String.format("https://apigee.com/platform/%s/proxy-performance", org);
             driver.get(orgAnalyticsPath);
 
-            // env selector
+            // find the environment selector
             (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.id("environmentSelector")));
-            // String envSelectorDropPath = "//div[id='environmentSelector']/a[contains(@class,'dropdown-toggle')]";
-            // (new WebDriverWait(driver, 10))
-            //     .until(ExpectedConditions.elementToBeClickable(By.xpath(envSelectorDropPath)));
-            // driver.findElement(By.xpath(envSelectorDropPath)).click();
             driver.findElement(By.id("environmentSelector")).click();
-            Thread.sleep(850);
-            
+            Thread.sleep(850); // wait for animation to complete
+
+            // select the correct environment
             String envSelectorPath = String.format("//div[@id='environmentSelector']/ul/li/a[normalize-space(text())='%s']", env);
-            // WebElement element1 = driver.findElement(By.xpath(envSelectorPath));
-            // if (element1 != null) {
-            //     System.out.printf("element1: '%s'\n", element1.getText());
-            // }
-            
-            //System.out.printf("waiting: %s\n", envSelectorPath);
             (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(envSelectorPath)));
             driver.findElement(By.xpath(envSelectorPath)).click();
 
+            // select the "Week" chart.
             String weekSelectorPath = "//div[contains(@class,'ax-toolbar')]/div[contains(@class,'date-range-container')]/div/div[contains(@class,'btn-group')]/button[normalize-space(text())='Week']";
             driver.findElement(By.xpath(weekSelectorPath)).click();
-            Thread.sleep(2750); // the legend is already showing. give it a chance to reset
+            Thread.sleep(1750); // the page will blank
 
+            // collapse the navbar. The pin-button appears on hover. Use "moveToElement" to accomplish this. 
+            String xpath1 = "//ul[@id='menu-list']";
+            WebElement element1 = driver.findElement(By.xpath(xpath1));
+            if (element1 != null) {
+                //System.out.printf("Found menu-list\n");
+                Actions builder = new Actions(driver);
+                builder.moveToElement(element1).perform();
+                Thread.sleep(1050); // allow the animation to complete
+                xpath1 = "//div[contains(@class,'pin-button')]";
+                element1 = driver.findElement(By.xpath(xpath1));
+                if (element1 != null) {
+                    //System.out.printf("Found pin-button\n");
+                    element1.click();
+                    Thread.sleep(1050); // allow the animation to complete
+                }
+                else {
+                    System.out.printf("Cannot find pin-button\n");
+                }
+                      
+            }
+            else {
+                System.out.printf("Cannot find menu-list\n");
+            }
+            
+            // wait for the chart legend to appear after selecting the new environment. 
             String summaryTitlePath = "//div[contains(@class,'ax-dashboard-element') and contains(@class,'top-element')]/div[contains(@class,'summary')]/div/div[contains(@class,'summary-title')]";
             (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(summaryTitlePath)));
             Thread.sleep(3750); // give any warnings a chance to disappear
             
-            // take screenshot
+            // finally, take the screenshot
             File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
             snapshotFile = String.format("/tmp/dashboard-%s.png", nowFormatted());
             FileUtils.copyFile(scrFile, new File(snapshotFile));
@@ -224,19 +234,18 @@ public class UEDashboardSnapper {
                 if (i+1 < L) {
                     i++;
                     Object current = this.options.get(m.group(1));
-                    ArrayList<String> newList;
                     if (current == null) {
                         // not a previously-seen option
                         this.options.put(m.group(1), args[i]);
                     }
                     else if (current instanceof ArrayList<?>) {
-                        // previously seen, and already a lsit
-                        newList = (ArrayList<String>) current;
-                        newList.add(args[i]);
+                        // previously seen, and already a list
+                        @SuppressWarnings("unchecked") ArrayList<String> oldList = (ArrayList<String>) current;
+                        oldList.add(args[i]);
                     }
                     else {
                         // we have one value, need to make a list
-                        newList = new ArrayList<String>();
+                        ArrayList<String> newList = new ArrayList<String>();
                         newList.add((String)current);
                         newList.add(args[i]);
                         this.options.put(m.group(1), newList);
