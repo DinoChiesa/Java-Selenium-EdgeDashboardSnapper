@@ -26,8 +26,12 @@ Example contents of autodash.properties:
 ```
 # these are secrets and should not be disclosed
 org=edge-org-name-here
+environments=prod
 username=dino@apigee.com
 password=MySecretPassword123
+chart=proxy
+windowSize=1920,1080
+wantZoom=true
 slackToken=acquire-this-from-www.slack.com
 # please url-escape @ and # in the slackchannel name
 slackChannel=%23slackbot
@@ -74,7 +78,7 @@ mvn exec:exec -Dautodash.properties=./autodash-ORGNAME.properties
 This reads from the autodash.properties file that is local to the invocation:
 
 ```
-java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.DashboardSnapper
+java -classpath "target/lib/*:target/autodash-20180917.jar"  com.dinochiesa.autodash.DashboardSnapper
 ```
 
 It's somewhat similar to the mvn exec:exec invocation above.
@@ -86,7 +90,7 @@ This invocation runs the UEDashboardSnapper, which captures the API Proxy traffi
 and uses .netrc to obtain credentials for Apigee Edge.
 
 ```
-java -classpath "target/lib/*:target/autodash-1.0-SNAPSHOT.jar"  com.dinochiesa.autodash.UEDashboardSnapper -P autodash-sbux-production.properties -n
+java -classpath "target/lib/*:target/autodash-20180917.jar"  com.dinochiesa.autodash.UEDashboardSnapper -n -P autodash-sbux-production.properties
 
 ```
 
@@ -112,10 +116,14 @@ If that bash script doesn't satisfy, you can modify it to suit your needs.
 
 ## License
 
-This material is [copyright 2016, 2017 Google Inc.](NOTICE)
+This material is [copyright 2016-2018 Google LLC.](NOTICE)
 and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration.
 
 
 ## Bugs
 
-* This tool cannot post to a Google Chat (Dynamite) room.  The API for Google chat doesn't allow upload of an image.
+* This tool cannot post to a Google Chat (Dynamite) room. The API for Google chat doesn't allow direct upload of an image; it must be a hosted image.
+
+
+
+
