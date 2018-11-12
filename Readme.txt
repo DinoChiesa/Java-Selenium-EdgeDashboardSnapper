@@ -1,12 +1,12 @@
-# Dashboard Snapper
+# Apigee Edge Dashboard Snapper sample tool
 
-This is a tool that posts a snapshot of an Apigee dashboard to a slack channel.
+This is a tool that screengrabs a snapshot of an Apigee Edge dashboard, then optionally posts it to a slack channel.
 
-This tool
+This tool:
 - drives a web browser to login to Edge,
 - navigates to a particular organization,
 - grabs a snapshot of the dashboard
-- and posts it to a slack channel of your choice.
+- and then optionally posts it to a slack channel of your choice.
 
 The tool depends on:
 
@@ -86,11 +86,10 @@ It's somewhat similar to the mvn exec:exec invocation above.
 
 ### Example 4
 
-This invocation runs the UEDashboardSnapper, which captures the API Proxy traffic over the past week.  It reads from the specified file
-and uses .netrc to obtain credentials for Apigee Edge.
+This invocation runs the UEDashboardSnapper, which captures the API Proxy traffic over the past week.  It reads from the specified file.  The -n option tells the tool to use .netrc to obtain credentials for Apigee Edge.
 
 ```
-java -classpath "target/lib/*:target/autodash-20180917.jar"  com.dinochiesa.autodash.UEDashboardSnapper -n -P autodash-sbux-production.properties
+java -classpath "target/lib/*:target/autodash-20180917.jar"  com.dinochiesa.autodash.UEDashboardSnapper -n -P autodash-orgname-production.properties
 
 ```
 
@@ -120,10 +119,16 @@ This material is [copyright 2016-2018 Google LLC.](NOTICE)
 and is licensed under the [Apache 2.0 License](LICENSE). This includes the Java code as well as the API Proxy configuration.
 
 
+## Disclaimer
+
+This example is not an official Google product, nor is it part of an official Google product.
+
+
 ## Bugs
 
-* This tool cannot post to a Google Chat (Dynamite) room. The API for Google chat doesn't allow direct upload of an image; it must be a hosted image.
+* There is not a good way to parameterize which dashboard to capture. Really there are only 2 options: the classic dashboard, and the UE traffic volume chart.
 
+* This tool cannot post to a Google Chat (Dynamite) room. Not really a bug in THIS tool, but rather a limitation in the tool due to a similar limitation in the API for Google chat. The API doesn't allow direct upload of an image; posting images to a Google Cht room is possible only with a URL of a previously hosted image.
 
 
 
